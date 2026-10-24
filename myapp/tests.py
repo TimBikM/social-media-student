@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from .models import ForumPost
+
 
 class LoginTests(TestCase):
     def setUp(self):
@@ -68,9 +70,11 @@ class LoginTests(TestCase):
         response = self.client.get(reverse("home"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<title>DevForum</title>")
+        self.assertContains(response, "<title>Classmates</title>")
         self.assertContains(response, "All Discussions")
         self.assertContains(response, "How to implement dark mode in Tailwind CSS effortlessly")
+        self.assertContains(response, 'id="menu-toggle"')
+        self.assertContains(response, 'id="site-menu"')
         self.assertContains(response, f'href="{reverse("calendar")}"', html=False)
         self.assertContains(response, "Chat")
         self.assertContains(
@@ -86,7 +90,66 @@ class LoginTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "calendar.html")
-        self.assertContains(response, "<title>Local Calendar</title>")
+        self.assertContains(response, "<title>Classmates | Calendar</title>")
+        self.assertContains(response, 'id="menu-toggle"')
+        self.assertContains(response, f'href="{reverse("home")}"', html=False)
+
+    def test_menu_is_available_on_login_and_signup_pages(self):
+        for url in (reverse("login"), reverse("signup")):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, 'id="menu-toggle"')
+                self.assertContains(response, f'href="{reverse("calendar")}"', html=False)
+
+    def test_authenticated_user_can_publish_forum_post(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("home"),
+            {"title": "Study group", "content": "Anyone interested in meeting this week?"},
+        )
+
+        self.assertRedirects(response, reverse("home"))
+        post = ForumPost.objects.get()
+        self.assertEqual(post.title, "Study group")
+        self.assertEqual(post.content, "Anyone interested in meeting this week?")
+        self.assertEqual(post.author, self.user)
+
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "Study group")
+        self.assertContains(response, "Anyone interested in meeting this week?")
+        self.assertContains(response, f"Posted by {self.user.username}")
+
+    def test_invalid_forum_post_is_not_published(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("home"),
+            {"title": "", "content": "Post without a title"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ForumPost.objects.count(), 0)
+        self.assertContains(response, "This field is required.")
+        self.assertNotContains(
+            response,
+            'id="post-form-container" class="hidden',
+            html=False,
+        )
+
+    def test_anonymous_user_cannot_publish_forum_post(self):
+        response = self.client.post(
+            reverse("home"),
+            {"title": "Study group", "content": "Let's meet."},
+        )
+
+        self.assertRedirects(
+            response,
+            f"{reverse('login')}?next={reverse('home')}",
+        )
+        self.assertEqual(ForumPost.objects.count(), 0)
 
     def test_logout_returns_to_login_page(self):
         self.client.force_login(self.user)

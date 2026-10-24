@@ -1,6 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+
+from .forms import ForumPostForm
+from .models import ForumPost
 
 
 class RememberMeLoginView(LoginView):
@@ -15,7 +18,21 @@ class RememberMeLoginView(LoginView):
 
 @login_required
 def home(request):
-    return render(request, "home.html")
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect("home")
+    else:
+        form = ForumPostForm()
+
+    return render(
+        request,
+        "home.html",
+        {"form": form, "posts": ForumPost.objects.select_related("author").all()},
+    )
 
 
 @login_required

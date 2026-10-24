@@ -1,0 +1,45 @@
+<div class="relative">
+    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu" class="rounded-lg bg-white p-2 text-slate-600 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 hover:text-brand-600">
+        <i class="fa-solid fa-bars text-xl"></i>
+    </button>
+    <nav id="site-menu" class="absolute left-0 top-full z-50 hidden mt-2 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg" aria-label="Main menu">
+        <a href="{% url 'home' %}" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <i class="fa-solid fa-house w-4 text-center"></i>
+            Home
+        </a>
+        <a href="{% url 'calendar' %}" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <i class="fa-regular fa-calendar w-4 text-center"></i>
+            Calendar
+        </a>
+        <button type="button" class="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+            <i class="fa-regular fa-comments w-4 text-center"></i>
+            Chat
+        </button>
+    </nav>
+</div>
+<script>
+    (() => {
+        const toggle = document.getElementById("menu-toggle");
+        const menu = document.getElementById("site-menu");
+
+        toggle.addEventListener("click", () => {
+            const isExpanded = toggle.getAttribute("aria-expanded") === "true";
+            toggle.setAttribute("aria-expanded", String(!isExpanded));
+            menu.classList.toggle("hidden", isExpanded);
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest("#menu-toggle, #site-menu")) {
+                toggle.setAttribute("aria-expanded", "false");
+                menu.classList.add("hidden");
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                toggle.setAttribute("aria-expanded", "false");
+                menu.classList.add("hidden");
+            }
+        });
+    })();
+</script>

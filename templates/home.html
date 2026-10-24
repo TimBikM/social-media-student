@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevForum</title>
+    <title>Classmates</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -55,27 +55,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Logo & Mobile Menu -->
             <div class="flex items-center gap-4">
-                <div class="relative lg:hidden">
-                    <button id="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" class="text-slate-500 hover:text-slate-700">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                        <span class="sr-only">Open menu</span>
-                    </button>
-                    <nav id="mobile-menu" class="hidden absolute left-0 top-full z-50 mt-2 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg" aria-label="More options">
-                        <a href="{% url 'calendar' %}" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                            <i class="fa-regular fa-calendar w-4 text-center"></i>
-                            Calendar
-                        </a>
-                        <button type="button" class="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
-                            <i class="fa-regular fa-comments w-4 text-center"></i>
-                            Chat
-                        </button>
-                    </nav>
-                </div>
+                {% include "includes/menu.html" %}
                 <a href="#" class="flex items-center gap-2" onclick="showListView()">
                     <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold">
                         <i class="fa-solid fa-layer-group"></i>
                     </div>
-                    <span class="font-bold text-xl tracking-tight text-slate-900 hidden sm:block">DevForum</span>
+                    <span class="font-bold text-xl tracking-tight text-slate-900 hidden sm:block">Classmates</span>
                 </a>
             </div>
 
@@ -91,7 +76,7 @@
 
             <!-- Right Actions -->
             <div class="flex items-center gap-4">
-                <button class="hidden sm:flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
+                <button type="button" onclick="togglePostForm()" class="hidden sm:flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm">
                     <i class="fa-solid fa-plus"></i> New Discussion
                 </button>
                 <button class="text-slate-500 hover:text-brand-600 transition-colors relative">
@@ -174,15 +159,49 @@
                 <!-- List Header Controls -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-4">
                     <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Latest Discussions</h1>
-                    <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
-                        <button class="px-4 py-1.5 text-sm font-medium bg-white text-slate-900 shadow-sm rounded-md">Latest</button>
-                        <button class="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 rounded-md transition-colors">Top</button>
-                        <button class="px-4 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 rounded-md transition-colors">Unanswered</button>
-                    </div>
+                    <button type="button" onclick="togglePostForm()" class="sm:hidden inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+                        <i class="fa-solid fa-plus"></i> New Discussion
+                    </button>
                 </div>
+
+                <section id="post-form-container" class="{% if not form.errors %}hidden {% endif %}mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="post-form-title">
+                    <h2 id="post-form-title" class="text-lg font-semibold text-slate-900">Start a discussion</h2>
+                    <form method="post" action="{% url 'home' %}" class="mt-4 space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label for="{{ form.title.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">Title</label>
+                            {{ form.title }}
+                            {% for error in form.title.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div>
+                            <label for="{{ form.content.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">Post</label>
+                            {{ form.content }}
+                            {% for error in form.content.errors %}<p class="mt-1 text-sm text-red-600">{{ error }}</p>{% endfor %}
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" onclick="togglePostForm()" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
+                            <button type="submit" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Publish</button>
+                        </div>
+                    </form>
+                </section>
 
                 <!-- Topic Items -->
                 <div class="mt-4 flex flex-col gap-3">
+
+                    {% for post in posts %}
+                    <article class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm sm:p-5">
+                        <div class="flex items-start gap-4">
+                            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-100 font-semibold text-brand-700">
+                                {{ post.author.username|first|upper }}
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h2 class="text-base font-semibold text-slate-900">{{ post.title }}</h2>
+                                <p class="mt-2 whitespace-pre-wrap break-words text-sm text-slate-700">{{ post.content }}</p>
+                                <p class="mt-3 text-xs text-slate-500">Posted by {{ post.author.username }} · {{ post.created_at|date:"M j, Y, g:i a" }}</p>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
 
                     <!-- Topic 1 (Clickable to view thread) -->
                     <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 sm:p-5 hover:border-brand-200 hover:shadow-md transition-all cursor-pointer group" onclick="showThreadView()">
@@ -463,7 +482,7 @@
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p class="text-slate-500 text-sm">© 2024 DevForum. All rights reserved.</p>
+            <p class="text-slate-500 text-sm">© 2024 Classmates. All rights reserved.</p>
             <div class="flex items-center gap-4 text-sm text-slate-500">
                 <a href="#" class="hover:text-slate-900 transition-colors">Terms</a>
                 <a href="#" class="hover:text-slate-900 transition-colors">Privacy</a>
@@ -474,16 +493,16 @@
 
     <!-- Interactive Scripts -->
     <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
         const listView = document.getElementById('view-topic-list');
         const threadView = document.getElementById('view-thread');
 
-        menuToggle.addEventListener('click', () => {
-            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
-            menuToggle.setAttribute('aria-expanded', String(!isExpanded));
-            mobileMenu.classList.toggle('hidden', isExpanded);
-        });
+        function togglePostForm() {
+            const postForm = document.getElementById('post-form-container');
+            postForm.classList.toggle('hidden');
+            if (!postForm.classList.contains('hidden')) {
+                postForm.querySelector('input').focus();
+            }
+        }
 
         function showThreadView() {
             listView.classList.add('hidden');

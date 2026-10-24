@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Calendar</title>
+    <title>Classmates | Calendar</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -104,9 +104,7 @@
     <!-- Header -->
     <header class="flex-none bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 sm:px-6 z-10">
         <div class="flex items-center gap-4">
-            <button class="text-slate-500 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100 transition-colors">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
+            {% include "includes/menu.html" %}
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded text-brand-600 flex items-center justify-center text-2xl">
                     <i class="fa-regular fa-calendar-days"></i>

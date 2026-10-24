@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in</title>
+    <title>Classmates | Sign in</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Inter -->
@@ -43,6 +43,8 @@
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 
+    <div class="fixed left-4 top-4 z-50">{% include "includes/menu.html" %}</div>
+
     <!-- Auth Container -->
     <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
         
@@ -51,6 +53,7 @@
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600 text-white mb-4 shadow-lg">
                 <i class="fa-solid fa-layer-group text-xl"></i>
             </div>
+            <p class="text-sm font-semibold text-brand-600">Classmates</p>
             <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Welcome back</h2>
             <p class="text-sm text-slate-500 mt-2">Please sign in to your account</p>
         </div>
