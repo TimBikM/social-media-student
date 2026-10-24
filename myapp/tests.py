@@ -62,6 +62,32 @@ class LoginTests(TestCase):
             f"{reverse('login')}?next={reverse('home')}",
         )
 
+    def test_authenticated_home_displays_forum(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<title>DevForum</title>")
+        self.assertContains(response, "All Discussions")
+        self.assertContains(response, "How to implement dark mode in Tailwind CSS effortlessly")
+        self.assertContains(response, f'href="{reverse("calendar")}"', html=False)
+        self.assertContains(response, "Chat")
+        self.assertContains(
+            response,
+            f'action="{reverse("logout")}"',
+            html=False,
+        )
+
+    def test_calendar_route_displays_existing_calendar(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("calendar"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "calendar.html")
+        self.assertContains(response, "<title>Local Calendar</title>")
+
     def test_logout_returns_to_login_page(self):
         self.client.force_login(self.user)
 
