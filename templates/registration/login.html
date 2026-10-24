@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+
+    <!-- Auth Container -->
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
+        
+        <!-- Logo Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600 text-white mb-4 shadow-lg">
+                <i class="fa-solid fa-layer-group text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Welcome back</h2>
+            <p class="text-sm text-slate-500 mt-2">Please sign in to your account</p>
+        </div>
+
+        <!-- Login View -->
+        <div id="login-view" class="animate-fade-in block">
+            <form class="space-y-5" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                    <div class="rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-700" role="alert">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+                <div>
+                    <label for="login-username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-envelope text-slate-400"></i>
+                        </div>
+                        <input id="login-username" name="username" type="text" autocomplete="username" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="Your username">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" value="1" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-slate-300 rounded cursor-pointer">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-600 cursor-pointer">
+                            Remember me
+                        </label>
+                    </div>
+
+                </div>
+
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                        Sign in
+                    </button>
+                </div>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-slate-600">
+                Don't have an account?
+                <a href="{% url 'signup' %}" class="font-medium text-blue-600 transition-colors hover:text-blue-700">
+                    Sign up
+                </a>
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
