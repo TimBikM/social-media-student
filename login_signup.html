@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum Authentication</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+
+    <!-- Auth Container -->
+    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
+        
+        <!-- Logo Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-600 text-white mb-4 shadow-lg">
+                <i class="fa-solid fa-layer-group text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 tracking-tight" id="form-title">Welcome back</h2>
+            <p class="text-sm text-slate-500 mt-2" id="form-subtitle">Please sign in to your account</p>
+        </div>
+
+        <!-- Login View -->
+        <div id="login-view" class="animate-fade-in block">
+            <form class="space-y-5" onsubmit="event.preventDefault();">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-slate-700 mb-1">Email or Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-envelope text-slate-400"></i>
+                        </div>
+                        <input id="login-email" name="email" type="text" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input id="login-password" name="password" type="password" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-slate-300 rounded cursor-pointer">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-600 cursor-pointer">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-brand-600 hover:text-brand-500 transition-colors">
+                            Forgot your password?
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                        Sign in
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-600">
+                    Don't have an account? 
+                    <button onclick="toggleView('signup')" class="font-medium text-brand-600 hover:text-brand-500 transition-colors">
+                        Sign up here
+                    </button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Signup View -->
+        <div id="signup-view" class="animate-fade-in hidden">
+            <form class="space-y-4" onsubmit="event.preventDefault();">
+                <div>
+                    <label for="signup-username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-user text-slate-400"></i>
+                        </div>
+                        <input id="signup-username" name="username" type="text" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="johndoe123">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-slate-700 mb-1">Email address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-envelope text-slate-400"></i>
+                        </div>
+                        <input id="signup-email" name="email" type="email" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input id="signup-password" name="password" type="password" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="Create a strong password">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="signup-confirm-password" class="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-check-double text-slate-400"></i>
+                        </div>
+                        <input id="signup-confirm-password" name="confirm-password" type="password" required class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-slate-50 focus:bg-white" placeholder="Repeat your password">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-colors">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-slate-600">
+                    Already have an account? 
+                    <button onclick="toggleView('login')" class="font-medium text-brand-600 hover:text-brand-500 transition-colors">
+                        Log in here
+                    </button>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript to handle view toggling -->
+    <script>
+        const loginView = document.getElementById('login-view');
+        const signupView = document.getElementById('signup-view');
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+
+        function toggleView(view) {
+            if (view === 'signup') {
+                // Hide login, show signup
+                loginView.classList.replace('block', 'hidden');
+                signupView.classList.replace('hidden', 'block');
+                
+                // Update headers
+                formTitle.textContent = 'Create an account';
+                formSubtitle.textContent = 'Join the DevForum community today';
+            } else {
+                // Hide signup, show login
+                signupView.classList.replace('block', 'hidden');
+                loginView.classList.replace('hidden', 'block');
+                
+                // Update headers
+                formTitle.textContent = 'Welcome back';
+                formSubtitle.textContent = 'Please sign in to your account';
+            }
+        }
+    </script>
+</body>
+</html>
