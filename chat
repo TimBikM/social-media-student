@@ -1,0 +1,67 @@
+from .models import Message # We need to create a model called Message in django
+
+User = get_user_model()
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def send_message(request):
+    receiver_username = request.data.get("receiver_username")
+    content = request.data.get("content", "")
+
+    try:
+        receiver = User.objects.get(username=receiver_username)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "Recipient not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    message = Message.objects.create(
+        sender=request.user,
+        receiver=receiver,
+        content=content
+        timestamp = timestamp
+    )
+    
+
+    return Response(
+        {
+            "sender": request.user.username,
+            "receiver": receiver.username,
+            "content": message.content,
+            "timestamp": message.timestamp
+        },
+        status=status.HTTP_201_CREATED
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_conversation(request, username):
+
+    try:
+        other_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Response(
+            {"error": "User not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    messages = Message.objects.filter(
+        Q(sender=request.user, receiver=other_user) |
+        Q(sender=other_user, receiver=request.user)
+    ).order_by("timestamp")
+
+    conversation = [
+        {
+            "sender": message.sender.username,
+            "receiver": message.receiver.username,
+            "content": message.content,
+            "timestamp": message.timestamp
+        }
+        for message in messages
+    ]
+
+    return Response(conversation, status=status.HTTP_200_OK)
+
+
