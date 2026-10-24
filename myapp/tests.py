@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import ForumPost
+from .models import ForumPost, Message
 
 
 class LoginTests(TestCase):
@@ -158,3 +158,114 @@ class LoginTests(TestCase):
 
         self.assertRedirects(response, reverse("login"))
         self.assertNotIn("_auth_user_id", self.client.session)
+
+
+class ChatTests(TestCase):
+    def setUp(self):
+        user_model = get_user_model()
+        self.sender = user_model.objects.create_user(
+            username="sender",
+            password="A-safe-test-password-123",
+        )
+        self.recipient = user_model.objects.create_user(
+            username="recipient",
+            password="A-safe-test-password-123",
+        )
+
+    def test_chat_page_lists_other_users_and_shows_shared_menu(self):
+        self.client.force_login(self.sender)
+
+        response = self.client.get(reverse("chat"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "chat.html")
+        self.assertContains(response, self.recipient.username)
+        self.assertContains(response, 'id="menu-toggle"')
+        self.assertContains(response, "Your messages")
+
+    def test_user_can_send_and_read_private_messages(self):
+        self.client.force_login(self.sender)
+        url = reverse(
+            "chat_conversation",
+            kwargs={"username": self.recipient.username},
+        )
+
+        response = self.client.post(
+            reverse(
+                "send_message",
+                kwargs={"username": self.recipient.username},
+            ),
+            {"content": "Hello there"},
+        )
+
+        self.assertRedirects(response, url)
+        message = Message.objects.get()
+        self.assertEqual(message.sender, self.sender)
+        self.assertEqual(message.receiver, self.recipient)
+        self.assertEqual(message.content, "Hello there")
+
+        response = self.client.get(url)
+        self.assertContains(response, "Hello there")
+        self.assertContains(response, "Private conversation")
+
+    def test_messages_are_visible_to_both_conversation_participants(self):
+        Message.objects.create(
+            sender=self.sender,
+            receiver=self.recipient,
+            content="Only these two users can see this.",
+        )
+        self.client.force_login(self.recipient)
+
+        response = self.client.get(
+            reverse(
+                "chat_conversation",
+                kwargs={"username": self.sender.username},
+            )
+        )
+
+        self.assertContains(response, "Only these two users can see this.")
+        self.assertContains(response, "sender")
+
+    def test_message_is_not_sent_when_content_is_empty(self):
+        self.client.force_login(self.sender)
+        url = reverse(
+            "chat_conversation",
+            kwargs={"username": self.recipient.username},
+        )
+
+        response = self.client.post(
+            reverse(
+                "send_message",
+                kwargs={"username": self.recipient.username},
+            ),
+            {"content": "   "},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], url)
+        self.assertEqual(Message.objects.count(), 0)
+        response = self.client.get(url)
+        self.assertContains(response, "Write a message before sending.")
+
+    def test_chat_requires_login_and_rejects_self_conversation(self):
+        conversation_url = reverse(
+            "chat_conversation",
+            kwargs={"username": self.recipient.username},
+        )
+        response = self.client.get(reverse("chat"))
+        self.assertRedirects(
+            response,
+            f"{reverse('login')}?next={reverse('chat')}",
+        )
+
+        self.client.force_login(self.sender)
+        self.assertEqual(
+            self.client.get(
+                reverse(
+                    "chat_conversation",
+                    kwargs={"username": self.sender.username},
+                )
+            ).status_code,
+            404,
+        )
+        self.assertEqual(self.client.get(conversation_url).status_code, 200)

@@ -16,12 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from chat import chat_page, get_conversation, send_message
 from myapp.views import RememberMeLoginView, calendar, home
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
     path("calendar.html", calendar, name="calendar"),
+    path("chat/", chat_page, name="chat"),
+    path("chat/<str:username>/", get_conversation, name="chat_conversation"),
+    path("chat/<str:username>/send/", send_message, name="send_message"),
     path("accounts/", include("mysite.accounts.urls")),
     path("accounts/login/", RememberMeLoginView.as_view(), name="login"),
     path("accounts/", include("django.contrib.auth.urls")),
